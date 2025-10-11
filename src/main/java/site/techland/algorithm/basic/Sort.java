@@ -9,13 +9,14 @@ import java.util.Arrays;
  */
 public class Sort {
     public static void main(String[] args) {
-        int[] nums = {2, 5, 34, 23, 46, 22, 23, 65, 35};
+        int[] nums = {2, 5, 34, 23, 46, 22, 23, 65, 35, 490, 458, 2345, 2345, 22838, 398, 4536, 432};
         //bubbleSort(nums);
         //selectionSort(nums);
         //insertionSort(nums);
         //nums = mergeSort(nums);
         //quickSort(nums);
-        nums = countingSort(nums);
+        //nums = countingSort(nums);
+        radixSort(nums);
         System.out.println(Arrays.toString(nums));
     }
 
@@ -37,6 +38,10 @@ public class Sort {
 
     /**
      * 选择排序, 与冒泡排序一样进行交换，因此时间复杂度一样O(n^2)，但是交换次数更少
+     * 稳定性：稳定
+     * 时间复杂度：最佳：O(n) ，最差：O(n^2)， 平均：O(n2)
+     * 空间复杂度：O(1)
+     * 排序方式：In-place
      * @param arr
      */
     public static void selectionSort(int[] arr) {
@@ -71,8 +76,8 @@ public class Sort {
     /**
      * 希尔排序：插排的优化
      * 稳定性：不稳定
-     * 时间复杂度：最佳：$O(nlogn)$， 最差：$O(n^2)$ 平均：$O(nlogn)$
-     * 空间复杂度：$O(1)$
+     * 时间复杂度：最佳：O(nlogn)， 最差：O(n^2) 平均：O(nlogn)
+     * 空间复杂度：O(1)
      * @param arr
      */
     public static void shellSort(int[] arr) {
@@ -94,8 +99,8 @@ public class Sort {
     /**
      * 归并排序：先让每个子序列有序，再使得子序列整体有序
      * 稳定性：稳定
-     * 时间复杂度：最佳：$O(nlogn)$， 最差：$O(nlogn)$， 平均：$O(nlogn)$
-     * 空间复杂度：$O(n)$
+     * 时间复杂度：最佳：O(nlogn)， 最差：O(nlogn)， 平均：O(nlogn)
+     * 空间复杂度：O(n)
      * @param arr
      */
     public static int[] mergeSort(int[] arr) {
@@ -129,6 +134,9 @@ public class Sort {
 
     /**
      * 快速排序：通过一趟排序将待排序序列分割成独立的两部分，其中一部分记录的元素均比另一部分元素小，则可分别对这两部分子序列继续进行排序，以达到整个序列有序
+     * 稳定性：不稳定
+     * 时间复杂度：最佳：O(nlogn)， 最差：O(n^2)，平均：O(nlogn)
+     * 空间复杂度：O(logn)
      * @param arr
      */
     public static void quickSort(int[] arr) {
@@ -165,8 +173,8 @@ public class Sort {
     /**
      * 计数排序：计数排序使用一个额外的数组 C，其中第 i 个元素是待排序数组 A 中值等于 i 的元素的个数。然后根据数组 C 来将 A 中的元素排到正确的位置。它只能对整数进行排序
      * 稳定性：稳定
-     * 时间复杂度：最佳：$O(n+k)$ 最差：$O(n+k)$ 平均：$O(n+k)$
-     * 空间复杂度：$O(k)$
+     * 时间复杂度：最佳：O(n+k) 最差：O(n+k) 平均：O(n+k)
+     * 空间复杂度：O(k)
      * 缺点： 只适用于小范围整数排序，如果数据最大最小差值比较大，那么需要大量额外内存空间
      * @param arr
      */
@@ -200,5 +208,51 @@ public class Sort {
             countArr[arr[i] - minValue]--; //减少一个为了避免数组中有重复数字的时候，计算出来的位置相同。
         }
         return result;
+    }
+
+    /**
+     * 基数排序：按照低位排序，然后收集；再按照高位排序，然后再收集，依此类推，直到最高位。
+     * 稳定性：稳定
+     * 时间复杂度：最佳：O(n×k) 最差：O(n×k) 平均：O(n×k)
+     * 空间复杂度：O(n+k)
+     * @param arr
+     * @return
+     * todo 支持负数排序
+     */
+    public static void radixSort(int[] arr) {
+        if (arr == null || arr.length <= 1) return;
+        // 找到最大值，确定最大位数
+        int max = Arrays.stream(arr).max().getAsInt();
+        int exp = 1; // 当前位（1 -> 个位，10 -> 十位，100 -> 百位）
+
+        // 临时数组保存每轮排序结果
+        int[] output = new int[arr.length];
+
+        // 按位排序，从个位 -> 十位 -> 百位 ...
+        while (max / exp > 0) {
+            int[] count = new int[10]; // 0-9 十个桶
+
+            // 统计每个桶中元素个数
+            for (int num : arr) {
+                int digit = (num / exp) % 10;
+                count[digit]++;
+            }
+
+            // 累加前缀和，确定每个桶的边界
+            for (int i = 1; i < 10; i++) {
+                count[i] += count[i - 1];
+            }
+
+            // 倒序遍历，保证稳定排序（相同数字保持原顺序）
+            for (int i = arr.length - 1; i >= 0; i--) {
+                int digit = (arr[i] / exp) % 10;
+                output[count[digit] - 1] = arr[i];
+                count[digit]--;
+            }
+            // 将结果拷贝回原数组
+            System.arraycopy(output, 0, arr, 0, arr.length);
+            // 下一位
+            exp *= 10;
+        }
     }
 }
