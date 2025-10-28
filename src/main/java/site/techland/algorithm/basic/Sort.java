@@ -255,4 +255,82 @@ public class Sort {
             exp *= 10;
         }
     }
+
+    public static void heapSort(int[] arr) {
+        if (arr == null || arr.length <= 1) return;
+
+        System.out.println("=== 堆排序开始 ===");
+        System.out.println(Arrays.toString(arr));
+        int n = arr.length;
+        //步骤1：构建最大堆
+        System.out.println("\n--- 构建最大堆 ---");
+        buildMaxHeap(arr, n);
+
+        // 步骤2：逐个提取最大元素
+        System.out.println("\n--- 排序过程 ---");
+        for (int i = n - 1; i > 0; i--) {
+            // 将堆顶元素（最大值）与当前末尾元素交换
+            swap(arr, 0, i);
+            System.out.println("交换堆顶和位置" + i + ": " + Arrays.toString(arr));
+
+            // 调整剩余元素，使其保持最大堆性质
+            heapify(arr, i, 0);
+
+            if (i > 1) {
+                System.out.println("调整后堆: " + Arrays.toString(Arrays.copyOf(arr, i)));
+            }
+        }
+
+        System.out.println("\n最终结果: " + Arrays.toString(arr));
+
+    }
+
+    private static void buildMaxHeap(int[] arr, int n) {
+        for (int i = n / 2 - 1; i >= 0; i--) {
+            System.out.println("调整节点 " + i + "(值=" + arr[i] + ")");
+            heapify(arr, n, i);
+            System.out.println("当前堆: " + Arrays.toString(Arrays.copyOf(arr, n)));
+        }
+        System.out.println("最大堆构建完成: " + Arrays.toString(arr));
+    }
+
+    /**
+     * 调整堆（堆化）
+     * @param arr 数组
+     * @param n 堆大小
+     * @param i 当前节点索引
+     */
+    private static void heapify(int[] arr, int n, int i) {
+        int largest = i;        // 初始化最大值为当前节点
+        int left = 2 * i + 1;   // 左孩子索引
+        int right = 2 * i + 2;  // 右孩子索引
+
+        // 如果左孩子存在且大于当前最大值
+        if (left < n && arr[left] > arr[largest]) {
+            largest = left;
+        }
+
+        // 如果右孩子存在且大于当前最大值
+        if (right < n && arr[right] > arr[largest]) {
+            largest = right;
+        }
+
+        // 如果最大值不是当前节点，需要交换并递归调整
+        if (largest != i) {
+            swap(arr, i, largest);
+            System.out.println("  交换: 位置" + i + "和位置" + largest +
+                    " -> " + Arrays.toString(Arrays.copyOf(arr, n)));
+            // 递归调整受影响的子树
+            heapify(arr, n, largest);
+        }
+    }
+
+    /**
+     * 交换数组中的两个元素
+     */
+    private static void swap(int[] arr, int i, int j) {
+        int temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+    }
 }
