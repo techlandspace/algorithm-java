@@ -13,27 +13,33 @@ public class M0438FindAnagrams {
     }
     
     public static List<Integer> findAnagrams(String s, String p) {
-        int left = 0;
-        List<Integer> result = new ArrayList<>();
-        int[] pCount = new int[26];
+        int sLen = s.length(), pLen = p.length();
+
+        if (sLen < pLen) {
+            return new ArrayList<Integer>();
+        }
+
+        List<Integer> ans = new ArrayList<Integer>();
         int[] sCount = new int[26];
-
-        for (char c : p.toCharArray()) {
-            pCount[c - 'a']++;
+        int[] pCount = new int[26];
+        for (int i = 0; i < pLen; ++i) {
+            ++sCount[s.charAt(i) - 'a'];
+            ++pCount[p.charAt(i) - 'a'];
         }
 
-        for (int right = 0; right < s.length(); right++) {
-            sCount[s.charAt(right) - 'a']++;
-            if(sCount[s.charAt(right) -'a'] > pCount[s.charAt(right) - 'a']) {
-                while(sCount[s.charAt(right) -'a'] > pCount[s.charAt(right) - 'a']) {
-                    sCount[s.charAt(left) - 'a']--;
-                    left++;
-                }
-            }
-            if (Arrays.equals(pCount, sCount)) {
-                result.add(left);
+        if (Arrays.equals(sCount, pCount)) {
+            ans.add(0);
+        }
+
+        for (int i = 0; i < sLen - pLen; ++i) {
+            --sCount[s.charAt(i) - 'a'];
+            ++sCount[s.charAt(i + pLen) - 'a'];
+
+            if (Arrays.equals(sCount, pCount)) {
+                ans.add(i + 1);
             }
         }
-        return result;
+
+        return ans;
     }
 }

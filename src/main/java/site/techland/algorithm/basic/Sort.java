@@ -46,15 +46,13 @@ public class Sort {
      */
     public static void selectionSort(int[] arr) {
         for (int i = 0; i < arr.length - 1; i++) {
-            int max = arr[0], index = 0, last = arr.length - i - 1;
-            for (int j = 1; j <= last; j++) {
-                if (arr[j] > max) {
-                    max = arr[j];
-                    index = j;
-                }
+            int idx = i;
+            for (int j = i+1; j < arr.length; j++) {
+                if (arr[j] < arr[idx]) idx = j;
             }
-            arr[index] = arr[last];
-            arr[last] = max;
+            int tmp = arr[i];
+            arr[i] = arr[idx];
+            arr[idx] = tmp;
         }
     }
 
